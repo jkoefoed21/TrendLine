@@ -8,13 +8,13 @@ namespace BestFitLine
 {
     static class Matrix
     {
-        public static double[,] invert (double[,] mat)
+        public static double[,] invert (double[,] mat) //Major problem here
         {
-            //print(mat);
+            print(mat);
             //print(copyAround(mat, 1, 2));
             //Console.WriteLine(determinant(copyAround(mat, 1, 2)));
             double det = 1.0/determinant(mat);
-            //Console.WriteLine(det);
+            Console.WriteLine(det);
             double[,] oldmat = mat;
             mat = new double[oldmat.GetLength(0), oldmat.GetLength(1)];
             for (int ii = 0; ii < mat.GetLength(0); ii++)
@@ -24,11 +24,11 @@ namespace BestFitLine
                     mat[ii,jj] = determinant(copyAround(oldmat, ii, jj));
                 }
             }
-            //print(mat);
+            print(mat);
             transpose(mat);
-            //print(mat);
+            print(mat);
             adjunct(mat);
-            //print(mat);
+            print(mat);
             multiply(mat, det);
             Console.WriteLine("Orig 1");
             print(mat);
@@ -41,6 +41,10 @@ namespace BestFitLine
             if (mat.GetLength(0)!=mat.GetLength(1))
             {
                 throw new ArgumentException();
+            }
+            if (mat.GetLength(0)==1)
+            {
+                return mat[0, 0];
             }
             if (mat.GetLength(0)==2)
             {
@@ -73,7 +77,13 @@ namespace BestFitLine
                     newMat[ii,jj] = mat[jj,ii];
                 }
             }
-            mat = newMat;
+            for (int ii = 0; ii < mat.GetLength(0); ii++)
+            {
+                for (int jj = 0; jj < mat.GetLength(1); jj++)
+                {
+                    mat[ii, jj] = newMat[ii, jj];
+                }
+            }
         }
 
         public static void adjunct (double [,] mat)
