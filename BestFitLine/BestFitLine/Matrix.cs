@@ -10,11 +10,11 @@ namespace BestFitLine
     {
         public static double[,] invert (double[,] mat) //Major problem here
         {
-            print(mat);
+            //print(mat);
             //print(copyAround(mat, 1, 2));
             //Console.WriteLine(determinant(copyAround(mat, 1, 2)));
             double det = 1.0/determinant(mat);
-            Console.WriteLine(det);
+            //Console.WriteLine(det);
             double[,] oldmat = mat;
             mat = new double[oldmat.GetLength(0), oldmat.GetLength(1)];
             for (int ii = 0; ii < mat.GetLength(0); ii++)
@@ -24,14 +24,14 @@ namespace BestFitLine
                     mat[ii,jj] = determinant(copyAround(oldmat, ii, jj));
                 }
             }
-            print(mat);
+            //print(mat);
             transpose(mat);
-            print(mat);
+            //print(mat);
             adjunct(mat);
-            print(mat);
+            //print(mat);
             multiply(mat, det);
-            Console.WriteLine("Orig 1");
-            print(mat);
+            //Console.WriteLine("Orig 1");
+            //print(mat);
             return mat;
         }
 

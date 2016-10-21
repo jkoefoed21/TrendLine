@@ -4,24 +4,30 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Diagnostics;
 
 namespace BestFitLine
 {
     class BestFit
     {
-        public static readonly int ORDER = 6; //this is actual highest x power
+        public static readonly int ORDER = 11; //this is actual highest x power
 
         public static String filePath = "C:\\Users\\Jack Koefoed\\OneDrive\\12\\Multi\\bestfit_dataset_example.txt";
 
         static void Main(String[] args)
         {
-            
-            double[,] origMat = { { 1, 3, 1.92 , 5 }, { 2, 1, 0.98 , 6 },{ 3, 2, 1.24 , 7 },{ 3, 5, 2.98 , 7 } };
-            Matrix.print(origMat);
-            //origMat =Matrix.invert(origMat);
-            Matrix.print(origMat);
-            Console.ReadKey();
+
+            /* double[,] origMat = { { 1, 3, 1.92 , 5 }, { 2, 1, 0.98 , 6 },{ 3, 2, 1.24 , 7 },{ 3, 5, 2.98 , 7 } };
+             Matrix.print(origMat);
+             //origMat =Matrix.invert(origMat);
+             Matrix.print(origMat);
+             Console.ReadKey();*/
+            Stopwatch s = new Stopwatch();
+            s.Start();
             getBestFit();
+            s.Stop();
+            Console.WriteLine(s.ElapsedMilliseconds);
+            Console.ReadKey();
         }
 
         static void getBestFit()
@@ -47,7 +53,7 @@ namespace BestFitLine
             }
             foreach (double d in xValues)
             {
-                Console.WriteLine(d);
+                //Console.WriteLine(d);
             }
             double[] xVals = xValues.ToArray();
             double[] yVals = yValues.ToArray();
@@ -71,14 +77,14 @@ namespace BestFitLine
             {
                 yMatrix[ii, 0] = mean(yVals, xVals, 1, ii);
             }
-            Console.WriteLine("Orig 2");
-            Matrix.print(origMatrix);
-            Matrix.print(newMat);
-            Console.WriteLine("Check Inverse");
-            Matrix.print(Matrix.multiply(origMatrix, newMat));
+            //Console.WriteLine("Orig 2");
+            //Matrix.print(origMatrix);
+            //Matrix.print(newMat);
+            //Console.WriteLine("Check Inverse");
+            //Matrix.print(Matrix.multiply(origMatrix, newMat));
             Console.WriteLine();
 
-            Matrix.print(yMatrix);
+            //Matrix.print(yMatrix);
 
             double[,] result=Matrix.multiply(origMatrix, yMatrix);
 
@@ -94,7 +100,6 @@ namespace BestFitLine
             //Matrix.invert(lol);
             Matrix.print(Matrix.multiply(lol, lmao));
             Console.ReadKey();*/
-            Console.ReadKey();
         }
         
         public static double mean(double[] nums, int power)
