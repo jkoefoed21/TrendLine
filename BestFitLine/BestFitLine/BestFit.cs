@@ -10,23 +10,50 @@ namespace BestFitLine
 {
     class BestFit
     {
-        public static readonly int ORDER = 10; 
+        public static readonly int ORDER = 3; 
 
         public static String filePath = "C:\\Users\\Jack Koefoed\\OneDrive\\12\\Multi\\bestfit_dataset_example.txt";
 
         static void Main(String[] args)
         {
-
-            /* double[][] origMat = { { 1, 3, 1.92 , 5 }, { 2, 1, 0.98 , 6 },{ 3, 2, 1.24 , 7 },{ 3, 5, 2.98 , 7 } };
-             Matrix.print(origMat);
-             //origMat =Matrix.invert(origMat);
-             Matrix.print(origMat);
-             Console.ReadKey();*/
+            /*
+             double[][] origMat = new double[][] 
+             { 
+                 new double[] { 1, 3, 1 }, 
+                 new double[] { 2, 1, 9 },
+                 new double[] { 3, 2, 1 },
+                 //new double[] { 3, 5, 2}
+             };
+             //Matrix.print(origMat);
+            Stopwatch s = new Stopwatch();
+            s.Start();
+            for (int ii = 0; ii < ITERATIONS; ii++)
+            {
+                origMat = Matrix.invert(origMat);
+            }
+            Console.WriteLine(s.ElapsedMilliseconds);
+            s.Restart();
+            //Matrix.print(origMat);
+            //Matrix.print(origMat);
+            origMat = new double[][]
+            {
+                 new double[] { 1, 3, 1 },
+                 new double[] { 2, 1, 9 },
+                 new double[] { 3, 2, 1 },
+            };
+            for (int ii = 0; ii < ITERATIONS; ii++)
+            {
+                origMat = Matrix.invertWithRowReduction(origMat);
+            }
+            Console.WriteLine(s.ElapsedMilliseconds);
+            Console.ReadKey();
+             */
             Stopwatch s = new Stopwatch();
             s.Start();
             getBestFit();
             s.Stop();
-            Console.WriteLine(s.ElapsedMilliseconds);
+            Console.WriteLine("\nTime: "+s.ElapsedMilliseconds);
+            //Console.WriteLine(Matrix.x);
             Console.ReadKey();
         }
 
@@ -41,7 +68,11 @@ namespace BestFitLine
                 String[] vals = line.Split('\t');
                 for(int ii=0; ii<vals.Length; ii++)
                 {
-                    if (ii%2==0)
+                    if (vals[ii].Equals(""))
+                    {
+
+                    }
+                    else if (ii%2==0)
                     {
                         xValues.Add(double.Parse(vals[ii]));
                     }
@@ -51,10 +82,7 @@ namespace BestFitLine
                     }
                 }
             }
-            foreach (double d in xValues)
-            {
-                //Console.WriteLine(d);
-            }
+
             double[] xVals = xValues.ToArray();
             double[] yVals = yValues.ToArray();
 
@@ -67,10 +95,8 @@ namespace BestFitLine
                     origMatrix[ii][jj] = mean(xVals, ORDER - 1 + ii - jj);
                 }
             }
-            double[][] newMat = (double[][])origMatrix.Clone();
-
             //Matrix.print(newMat);
-            origMatrix =Matrix.invert(origMatrix);
+            origMatrix =Matrix.invertWithRowReduction(origMatrix);
 
             double[][] yMatrix = new double[ORDER][];
 
@@ -121,7 +147,7 @@ namespace BestFitLine
                 throw new ArgumentException("Lists not same size.");
             }
             double total = 0;
-            for (int ii=0; ii<nums1.Length; ii++)
+            for (int ii=0; ii<nums1.Length; ii++) 
             {
                 total += (Math.Pow(nums1[ii], power1) * Math.Pow(nums2[ii], power2));
             }
