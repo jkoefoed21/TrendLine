@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace BestFitLine
 {
-    class BestFit
+    static class BestFit
     {
         public static readonly int ORDER = 3; 
 
@@ -57,11 +57,16 @@ namespace BestFitLine
             Console.ReadKey();
         }
 
-        static void getBestFit()
+        /// <summary>
+        /// Gets and prints the best fit coefficients from file input
+        /// Basically a main method
+        /// </summary>
+        public static void getBestFit()
         {
             List<double> xValues = new List<double>();
             List<double> yValues = new List<double>();
 
+            //file I/O stuff
             String[] lines = File.ReadAllLines(filePath);
             foreach (String line in lines)
             {
@@ -83,51 +88,42 @@ namespace BestFitLine
                 }
             }
 
+            //easier and faster to access
             double[] xVals = xValues.ToArray();
             double[] yVals = yValues.ToArray();
 
-            double[][] origMatrix = new double[ORDER][];
+            //sets the square matrix
+            double[][] origMatrix = new double[ORDER+1][];
             for (int ii=0; ii<origMatrix.Length; ii++)
             {
-                origMatrix[ii] = new double[ORDER];
+                origMatrix[ii] = new double[ORDER+1];
                 for (int jj = 0; jj < origMatrix[ii].Length; jj++)
                 {
                     origMatrix[ii][jj] = mean(xVals, ORDER - 1 + ii - jj);
                 }
             }
-            //Matrix.print(newMat);
+
             origMatrix =Matrix.invertWithRowReduction(origMatrix);
 
-            double[][] yMatrix = new double[ORDER][];
+            double[][] yMatrix = new double[ORDER+1][];
 
+            //sets the ymatrix
             for (int ii=0; ii<yMatrix.Length; ii++)
             {
                 yMatrix[ii] = new double[1];
                 yMatrix[ii][0] = mean(yVals, xVals, 1, ii);
             }
-            //Console.WriteLine("Orig 2");
-            //Matrix.print(origMatrix);
-            //Matrix.print(newMat);
-            //Console.WriteLine("Check Inverse");
-            //Matrix.print(Matrix.multiply(origMatrix, newMat));
             Console.WriteLine();
 
-            //Matrix.print(yMatrix);
-
+            //multiplies the inverse across
             double[][] result=Matrix.multiply(origMatrix, yMatrix);
 
+            //prints
             Console.WriteLine("Values:");
             for (int ii=0; ii<result.Length; ii++)
             {
-                Console.WriteLine(result[ii][0]);
+                Console.WriteLine(result[ii][0] + " x^"+(result.Length-ii-1));
             }
-            /*
-            double[][] lol = { { 1, 3, 1 , 5 }, { 2, 1, 0 , 6 },{ 3, 2, 1 , 7 },{ 3, 5, 2, 7 } };
-            double[][] lmao = { { 1 }, { 2 }, { 4 }, { 3 } };
-            double[][] rofl = { { 2, 3 }, { 5, 6 } };
-            //Matrix.invert(lol);
-            Matrix.print(Matrix.multiply(lol, lmao));
-            Console.ReadKey();*/
         }
         
         public static double mean(double[] nums, int power)

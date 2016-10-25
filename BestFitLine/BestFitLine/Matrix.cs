@@ -8,15 +8,18 @@ namespace BestFitLine
 {
     static class Matrix
     {
-        //public static int x = 0;
-
-        public static double[][] invert (double[][] mat) //slow as shite
+        /// <summary>
+        /// Takes the inverse of a matrix without changing the underlying matrix using the matrix of minors
+        /// </summary>
+        /// <param name="mat">The matrix to be inverted</param>
+        /// <returns>The inverted matrix</returns>
+        public static double[][] invertUsingCramers (double[][] mat) //Terrible one it gets big.
         {
-            //print(mat);
-            //print(copyAround(mat, 1, 2));
-            //Console.WriteLine(determinant(copyAround(mat, 1, 2)));
+            if (mat.Length!=mat[0].Length)
+            {
+                throw new ArgumentException();
+            }
             double det = 1.0/determinant(mat);
-            //Console.WriteLine(det);
             double[][] oldmat = mat;
             mat = new double[oldmat.Length][];
             for (int ii = 0; ii < mat.Length; ii++)
@@ -27,21 +30,19 @@ namespace BestFitLine
                     mat[ii][jj] = determinant(copyAround(oldmat, ii, jj));
                 }
             }
-            //print(mat);
             mat=transpose(mat);
-            //print(mat);
             adjunct(mat);
-            //print(mat);
             multiply(mat, det);
-            //Console.WriteLine("Orig 1");
-            //print(mat);
             return mat;
         }
 
-
-        public static double determinant (double[][] mat)
+        /// <summary>
+        /// Takes the determinant of a square matrix
+        /// </summary>
+        /// <param name="mat">The matrix</param>
+        /// <returns>The determinant</returns>
+        public static double determinant (double[][] mat) //if mat dimensions get 8-9ish, this gets reallll sloowwwwww
         {
-            //x++;
             if (mat.Length!=mat[0].Length) //not safe but is a compromise between safety and speed
             {
                 throw new ArgumentException();
@@ -57,27 +58,39 @@ namespace BestFitLine
             else
             {
                 double total = 0;
-                for (int ii=0; ii<mat[0].Length; ii++)
+                for (int ii=0; ii<mat[0].Length; ii++) //this recurses too much if determinant is 8-9ish
                 {
-                    double val = Math.Pow(-1, ii) * mat[0][ii]*determinant(copyAround(mat, 0, ii));
+                    double val = Math.Pow(-1, ii) * mat[0][ii]*determinant(mat, 0, ii);
                     total += val;
                 }
                 return total;
             }
         }
 
+        /// <summary>
+        /// Takes the determinant of a matrix around a specific value of the matrix
+        /// </summary>
+        /// <param name="mat">The matrix</param>
+        /// <param name="row">The row of the value</param>
+        /// <param name="col">The column of the value</param>
+        /// <returns>The determinant</returns>
         public static double determinant (double[][] mat, double row, double col)
         {
             return determinant(copyAround(mat, row, col));
         }
 
+        /// <summary>
+        /// Transposes a matrix without changing the input matrix
+        /// </summary>
+        /// <param name="mat"> The matrix to be transposed</param>
+        /// <returns> The transposed matrix </returns>
         public static double[][] transpose (double[][] mat) //this is shite
         {
-            double[][] newMat = new double[mat.Length][];
-            for (int ii=0; ii<mat.Length; ii++)
+            double[][] newMat = new double[mat[0].Length][];
+            for (int ii=0; ii<newMat.Length; ii++)
             {
-                newMat[ii] = new double[mat[ii].Length];
-                for (int jj=0; jj<mat[ii].Length; jj++)
+                newMat[ii] = new double[mat.Length];
+                for (int jj=0; jj<newMat[ii].Length; jj++)
                 {
                     newMat[ii][jj] = mat[jj][ii];
                 }
@@ -85,6 +98,10 @@ namespace BestFitLine
             return newMat;
         }
 
+        /// <summary>
+        /// Checkboards a matrix IN-PLACE
+        /// </summary>
+        /// <param name="mat"> </param>
         public static void adjunct (double [][] mat)
         {
             for (int ii = 0; ii < mat.Length; ii++)
@@ -96,6 +113,11 @@ namespace BestFitLine
             }
         }
 
+        /// <summary>
+        /// Multiplies a matrix by a scalar
+        /// </summary>
+        /// <param name="mat">The matrix</param>
+        /// <param name="value">The scalar</param>
         public static void multiply (double[][] mat, double value)
         {
             for (int ii = 0; ii < mat.Length; ii++)
@@ -107,6 +129,13 @@ namespace BestFitLine
             }
         }
 
+        /// <summary>
+        /// Creates a new matrix consisting of the original matrix without a row and a column
+        /// </summary>
+        /// <param name="mat"> The old matrix</param>
+        /// <param name="row"> The row to be eliminated </param>
+        /// <param name="col"> The column to be eliminated </param>
+        /// <returns> The new matrix </returns>
         public static double[][] copyAround (double[][] mat, double row, double col) //working
         {
             double[][] newMat = new double[mat.Length-1][];
@@ -121,6 +150,11 @@ namespace BestFitLine
             }
             return newMat;
         }
+
+        /// <summary>
+        /// Prints a representation of a matrix to the console 
+        /// </summary>
+        /// <param name="mat"> The matrix to be printed </param>
         public static void print(double[][] mat)
         {
             for (int ii = 0; ii < mat.Length; ii++)
@@ -133,6 +167,12 @@ namespace BestFitLine
             }
         }
 
+        /// <summary>
+        /// Multiplies a matrix by a matrix 
+        /// </summary>
+        /// <param name="mat1">The first matrix</param>
+        /// <param name="mat2">The second matrix</param>
+        /// <returns>The resulting matrix</returns>
         public static double[][] multiply(double[][] mat1, double[][] mat2)
         {
             if (mat1[0].Length!=mat2.Length)
@@ -157,19 +197,20 @@ namespace BestFitLine
             return result;
         }
         
+        /// <summary>
+        /// Uses row reduction to invert a matrix
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
         public static double[][] invertWithRowReduction (double[][] mat) //ALWAYS FASTER THAN CRAMERS RULE
         {
-            /*if (determinant(mat)==0)
-            {
-                throw new ArgumentException("Non-invertible matrix");
-            }*/
-            /*if (mat.Length < 4)
-            {
-                return invert(mat);
-            }*/
             double[][] bigMat = new double[mat.Length][];
             for (int ii=0; ii<mat.Length; ii++)
             {
+                if (mat[ii].Length!=mat.Length)
+                {
+                    throw new ArgumentException("Cannot invert non-square matrix");
+                }
                 bigMat[ii] = new double[2*mat[ii].Length];
                 for (int jj=0; jj<mat[ii].Length; jj++)
                 {
@@ -180,33 +221,29 @@ namespace BestFitLine
                     }
                 }
             }
-            //print(bigMat);
-            for (int ii=0; ii<bigMat[0].Length/2-1; ii++) //ii is number to eliminate
+            //this cascades the left side of bigMat to eliminate the bottom-left half of the orig matrix.
+            for (int ii=0; ii<bigMat[0].Length/2-1; ii++) //ii is column to eliminate
             {
                 for (int jj=1+ii; jj<bigMat.Length; jj++) //jj is row to eliminate
                 {
                     reduceRow(bigMat[jj], bigMat[ii], ii);
-                    //print(bigMat);
-                    //Console.WriteLine();
                 }
-                //Console.WriteLine(ii);
-            } //get down to a single value in the last row, then cascade that back up.
-            //Console.WriteLine("SPLIT");
+            } 
+            //this then cascades everything back up, working column by column all the way up
+            //leaving only the diagonals
             for (int ii=bigMat[0].Length/2-1; ii>0; ii--)//value to come back to
             {
                 for (int jj=ii-1; jj>-1; jj--) //row being operated on
                 {
                     reduceRow(bigMat[jj], bigMat[ii], ii);
-                    //print(bigMat);
-                    //Console.WriteLine();
                 }
                 //Console.WriteLine(ii);
             }
+            //this then gets the diagonal to be all ones
             for (int ii=0; ii<bigMat.Length; ii++)
             {
                 divideRow(bigMat[ii], ii);
             }
-            //print(bigMat);
 
             double[][] outMat = new double[mat.Length][];
 
@@ -218,32 +255,41 @@ namespace BestFitLine
                     outMat[ii][jj] = bigMat[ii][jj + outMat[ii].Length];
                 }
             }
+            double[][] checkInv = multiply(multiply(outMat, mat), mat);
+            if (checkInv.Length!=mat.Length)
+            {
+                throw new ArgumentException("Check Inv length does not match original matrix dimensions");
+            }
+            for(int ii=0; ii<checkInv.Length; ii++)
+            {
+                if (checkInv[ii].Length != mat[ii].Length)
+                {
+                    throw new ArgumentException("Check Inv length does not match original matrix dimensions");
+                }
+                for (int jj=0; jj<checkInv.Length; jj++)
+                {
+                    if (Math.Abs(checkInv[ii][jj]-mat[ii][jj])>0.01)
+                    {
+                        throw new ArgumentException("Error inverting matrix");
+                    }
+                }
+            }
+
             return outMat;
         }
 
+        /// <summary>
+        /// Adds an array to another to make a specified value of the array equal to zero.
+        /// </summary>
+        /// <param name="row">The row being reduced </param>
+        /// <param name="addor"> The row doing the reducing </param>
+        /// <param name="elimValue"> The index of the row array being set to zero </param>
         public static void reduceRow (double[] row, double[] addor, int elimValue)
-        {/*
-            int rowHighestValue = 0;
-            int addorHighestValue = 0;
-            for (int ii=0; ii<row.Length/2; ii++)
+        {
+            if (addor[elimValue]==0)
             {
-                if (row[ii] == 0)
-                {
-                    rowHighestValue++;
-                }
+                throw new ArithmeticException("Addor at elimValue: " + elimValue + " equals zero.");
             }
-            for (int ii = 0; ii < addor.Length / 2; ii++)
-            {
-                if (addor[ii] == 0)
-                {
-                    addorHighestValue++;
-                }
-            }
-            if (addorHighestValue!=rowHighestValue)
-            {
-                Console.WriteLine("You're retarded!");
-            }
-            int multiplier = rowHighestValue / addorHighestValue;*/
             double multiplier = row[elimValue] / addor[elimValue];
             for (int ii=0; ii<row.Length; ii++)
             {
@@ -251,6 +297,11 @@ namespace BestFitLine
             }
         }
 
+        /// <summary>
+        /// Divides all values in an array by a value
+        /// </summary>
+        /// <param name="row"> The array being divided</param>
+        /// <param name="value"> The divisor </param>
         public static void divideRow(double[] row, int value)
         {
             double multiplier = row[value];
