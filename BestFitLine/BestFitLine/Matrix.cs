@@ -13,7 +13,7 @@ namespace BestFitLine
         /// </summary>
         /// <param name="mat">The matrix to be inverted</param>
         /// <returns>The inverted matrix</returns>
-        public static double[][] invertUsingCramers (double[][] mat) //Terrible one it gets big.
+        public static double[][] invertUsingMinors (double[][] mat) //Terrible one it gets big.
         {
             if (mat.Length!=mat[0].Length)
             {
@@ -255,7 +255,10 @@ namespace BestFitLine
                     outMat[ii][jj] = bigMat[ii][jj + outMat[ii].Length];
                 }
             }
+
             double[][] checkInv = multiply(multiply(outMat, mat), mat);
+            //print(checkInv);
+            //print(mat);
             if (checkInv.Length!=mat.Length)
             {
                 throw new ArgumentException("Check Inv length does not match original matrix dimensions");
@@ -268,9 +271,9 @@ namespace BestFitLine
                 }
                 for (int jj=0; jj<checkInv.Length; jj++)
                 {
-                    if (Math.Abs(checkInv[ii][jj]-mat[ii][jj])>0.01)
+                    //if (Math.Abs(checkInv[ii][jj]/mat[ii][jj]))
                     {
-                        throw new ArgumentException("Error inverting matrix");
+                        //throw new ArgumentException("Error inverting matrix");
                     }
                 }
             }

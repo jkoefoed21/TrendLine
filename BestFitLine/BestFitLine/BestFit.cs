@@ -10,50 +10,27 @@ namespace BestFitLine
 {
     static class BestFit
     {
-        public static readonly int ORDER = 3; 
+        /// <summary>
+        /// The order of the highest coefficient
+        /// </summary>
+        public static readonly int ORDER = 1; 
 
+        /// <summary>
+        /// A hard-coded filePath to test
+        /// </summary>
         public static String filePath = "C:\\Users\\Jack Koefoed\\OneDrive\\12\\Multi\\bestfit_dataset_example.txt";
 
-        static void Main(String[] args)
+        /// <summary>
+        /// The main method. Runs getBestFit and times it.
+        /// </summary>
+        /// <param name="meh"> Console input </param>
+        static void Main(String[] meh)
         {
-            /*
-             double[][] origMat = new double[][] 
-             { 
-                 new double[] { 1, 3, 1 }, 
-                 new double[] { 2, 1, 9 },
-                 new double[] { 3, 2, 1 },
-                 //new double[] { 3, 5, 2}
-             };
-             //Matrix.print(origMat);
-            Stopwatch s = new Stopwatch();
-            s.Start();
-            for (int ii = 0; ii < ITERATIONS; ii++)
-            {
-                origMat = Matrix.invert(origMat);
-            }
-            Console.WriteLine(s.ElapsedMilliseconds);
-            s.Restart();
-            //Matrix.print(origMat);
-            //Matrix.print(origMat);
-            origMat = new double[][]
-            {
-                 new double[] { 1, 3, 1 },
-                 new double[] { 2, 1, 9 },
-                 new double[] { 3, 2, 1 },
-            };
-            for (int ii = 0; ii < ITERATIONS; ii++)
-            {
-                origMat = Matrix.invertWithRowReduction(origMat);
-            }
-            Console.WriteLine(s.ElapsedMilliseconds);
-            Console.ReadKey();
-             */
             Stopwatch s = new Stopwatch();
             s.Start();
             getBestFit();
             s.Stop();
             Console.WriteLine("\nTime: "+s.ElapsedMilliseconds);
-            //Console.WriteLine(Matrix.x);
             Console.ReadKey();
         }
 
@@ -99,7 +76,7 @@ namespace BestFitLine
                 origMatrix[ii] = new double[ORDER+1];
                 for (int jj = 0; jj < origMatrix[ii].Length; jj++)
                 {
-                    origMatrix[ii][jj] = mean(xVals, ORDER - 1 + ii - jj);
+                    origMatrix[ii][jj] = mean(xVals, ORDER + ii - jj);
                 }
             }
 
@@ -117,15 +94,28 @@ namespace BestFitLine
 
             //multiplies the inverse across
             double[][] result=Matrix.multiply(origMatrix, yMatrix);
-
+            double[] coefficients = new double[result.Length];
+            for (int ii=0; ii<coefficients.Length; ii++)
+            {
+                coefficients[ii] = result[ii][0];
+            }
             //prints
             Console.WriteLine("Values:");
             for (int ii=0; ii<result.Length; ii++)
             {
-                Console.WriteLine(result[ii][0] + " x^"+(result.Length-ii-1));
+                Console.WriteLine(coefficients[ii] + " x^"+(coefficients.Length-ii-1));
             }
+            Console.WriteLine();
+            double RSQ = calculateRSquared(xVals, yVals, coefficients);
+            Console.WriteLine("R squared="+RSQ);
         }
         
+        /// <summary>
+        /// Takes the mean of a set of numbers to a given power
+        /// </summary>
+        /// <param name="nums"> The number set to be exponentiated and summed</param>
+        /// <param name="power"> The power</param>
+        /// <returns> The mean </returns>
         public static double mean(double[] nums, int power)
         {
             double total = 0;
@@ -136,6 +126,14 @@ namespace BestFitLine
             return total / nums.Length;
         }
 
+        /// <summary>
+        /// Takes the mean of combinations of numbers to powers
+        /// </summary>
+        /// <param name="nums1"> The first set of numbers </param>
+        /// <param name="nums2"> The second set of numbers</param>
+        /// <param name="power1"> The power for nums1 </param>
+        /// <param name="power2"> The power for nums2 </param>
+        /// <returns>The mean</returns>
         public static double mean(double[] nums1, double[] nums2, int power1, int power2)
         {
             if (nums1.Length!=nums2.Length)
@@ -148,6 +146,38 @@ namespace BestFitLine
                 total += (Math.Pow(nums1[ii], power1) * Math.Pow(nums2[ii], power2));
             }
             return total / nums1.Length;
+        }
+
+        /// <summary>
+        /// Calculates the R Squared Value for a polynomial trendline
+        /// </summary>
+        /// <param name="xVals"> The X Values of all points in the set</param>
+        /// <param name="yVals"> The Y Values of all points in the set, in the same order as the x values</param>
+        /// <param name="coefficients"> The coefficients of the polynomial trendline, from highest to lowest order</param>
+        /// <returns>An R squared value for the line</returns>
+        public static double calculateRSquared(double[] xVals, double[] yVals, double[] coefficients)
+        {
+            if (xVals.Length!=yVals.Length)
+            {
+                throw new ArgumentException("Failure in R Squared.");
+            }
+            double ymean = mean(yVals, 1);
+            double totalSum = 0;
+            for (int ii=0; ii<xVals.Length; ii++)
+            {
+                totalSum += Math.Pow(yVals[ii] - ymean, 2);
+            }
+            double resSum = 0;
+            for (int ii=0; ii<xVals.Length; ii++)
+            {
+                double estVal = 0;
+                for (int jj=0; jj<coefficients.Length; jj++)
+                {
+                    estVal += coefficients[jj]*Math.Pow(xVals[ii], coefficients.Length - 1 - jj);
+                }
+                resSum += Math.Pow(yVals[ii] - estVal, 2);
+            }
+            return 1 - (resSum / totalSum);
         }
     }
 }
