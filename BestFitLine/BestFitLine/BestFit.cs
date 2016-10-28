@@ -9,16 +9,8 @@ using System.Diagnostics;
 namespace BestFitLine
 {
     static class BestFit
-    {
-        /// <summary>
-        /// The order of the highest coefficient
-        /// </summary>
-        public static readonly int ORDER = 1; 
-
-        /// <summary>
-        /// A hard-coded filePath to test
-        /// </summary>
-        public static String filePath = "C:\\Users\\Jack Koefoed\\OneDrive\\12\\Multi\\bestfit_dataset_example.txt";
+    { 
+        // "C:\Users\Jack Koefoed\OneDrive\12\Multi\least_squares_sample4.txt";
 
         /// <summary>
         /// The main method. Runs getBestFit and times it.
@@ -26,19 +18,60 @@ namespace BestFitLine
         /// <param name="meh"> Console input </param>
         static void Main(String[] meh)
         {
+            String filePath = getPath();
+            int order = getorder();
             Stopwatch s = new Stopwatch();
             s.Start();
-            getBestFit();
+            getBestFit(filePath, order);
             s.Stop();
             Console.WriteLine("\nTime: "+s.ElapsedMilliseconds);
             Console.ReadKey();
+        }
+
+        public static int getorder()
+        {
+            while (true)
+            {
+                Console.Write("order of trendline: ");
+                String input = Console.ReadLine();
+                try
+                {
+                    int order = int.Parse(input);
+                    if (order>4||order<1)
+                    {
+                        throw new ArgumentException();
+                    }
+                    return order;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Please enter a valid integer between 1 and 4");
+                }
+            }
+        }
+
+        public static string getPath()
+        {
+            while (true)
+            {
+                Console.Write("Filepath to Operate On: ");
+                String input = Console.ReadLine();
+                if (File.Exists(input))
+                {
+                    return input;
+                }
+                else
+                {
+                    Console.WriteLine("File does not exist. Please Try Again.");
+                }
+            }
         }
 
         /// <summary>
         /// Gets and prints the best fit coefficients from file input
         /// Basically a main method
         /// </summary>
-        public static void getBestFit()
+        public static void getBestFit(String filePath, int order)
         {
             List<double> xValues = new List<double>();
             List<double> yValues = new List<double>();
@@ -70,19 +103,19 @@ namespace BestFitLine
             double[] yVals = yValues.ToArray();
 
             //sets the square matrix
-            double[][] origMatrix = new double[ORDER+1][];
+            double[][] origMatrix = new double[order+1][];
             for (int ii=0; ii<origMatrix.Length; ii++)
             {
-                origMatrix[ii] = new double[ORDER+1];
+                origMatrix[ii] = new double[order+1];
                 for (int jj = 0; jj < origMatrix[ii].Length; jj++)
                 {
-                    origMatrix[ii][jj] = mean(xVals, ORDER + ii - jj);
+                    origMatrix[ii][jj] = mean(xVals, order + ii - jj);
                 }
             }
 
             origMatrix =Matrix.invertWithRowReduction(origMatrix);
 
-            double[][] yMatrix = new double[ORDER+1][];
+            double[][] yMatrix = new double[order+1][];
 
             //sets the ymatrix
             for (int ii=0; ii<yMatrix.Length; ii++)
@@ -97,13 +130,13 @@ namespace BestFitLine
             double[] coefficients = new double[result.Length];
             for (int ii=0; ii<coefficients.Length; ii++)
             {
-                coefficients[ii] = result[ii][0];
+                coefficients[ii] = result[result.Length-ii-1][0];
             }
             //prints
             Console.WriteLine("Values:");
-            for (int ii=0; ii<result.Length; ii++)
+            for (int ii=coefficients.Length-1; ii>=0; ii--)
             {
-                Console.WriteLine(coefficients[ii] + " x^"+(coefficients.Length-ii-1));
+                Console.WriteLine(coefficients[ii] + " x^"+(ii));
             }
             Console.WriteLine();
             double RSQ = calculateRSquared(xVals, yVals, coefficients);
@@ -173,7 +206,7 @@ namespace BestFitLine
                 double estVal = 0;
                 for (int jj=0; jj<coefficients.Length; jj++)
                 {
-                    estVal += coefficients[jj]*Math.Pow(xVals[ii], coefficients.Length - 1 - jj);
+                    estVal += coefficients[jj]*Math.Pow(xVals[ii], jj);
                 }
                 resSum += Math.Pow(yVals[ii] - estVal, 2);
             }
