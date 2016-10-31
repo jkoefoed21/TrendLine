@@ -10,8 +10,6 @@ namespace BestFitLine
 {
     static class BestFit
     { 
-        // "C:\Users\Jack Koefoed\OneDrive\12\Multi\least_squares_sample4.txt";
-
         /// <summary>
         /// The main method. Runs getBestFit and times it.
         /// </summary>
@@ -32,7 +30,7 @@ namespace BestFitLine
         {
             while (true)
             {
-                Console.Write("order of trendline: ");
+                Console.Write("Order of trendline: ");
                 String input = Console.ReadLine();
                 try
                 {

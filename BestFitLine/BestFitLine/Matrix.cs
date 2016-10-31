@@ -13,7 +13,7 @@ namespace BestFitLine
         /// </summary>
         /// <param name="mat">The matrix to be inverted</param>
         /// <returns>The inverted matrix</returns>
-        public static double[][] invertUsingMinors (double[][] mat) //Terrible one it gets big.
+        public static double[][] invertUsingMinors (double[][] mat) //Terrible once it gets big.
         {
             if (mat.Length!=mat[0].Length)
             {
@@ -31,7 +31,7 @@ namespace BestFitLine
                 }
             }
             mat=transpose(mat);
-            adjunct(mat);
+            negatives(mat);
             multiply(mat, det);
             return mat;
         }
@@ -102,7 +102,7 @@ namespace BestFitLine
         /// Checkboards a matrix IN-PLACE
         /// </summary>
         /// <param name="mat"> </param>
-        public static void adjunct (double [][] mat)
+        public static void negatives (double [][] mat)
         {
             for (int ii = 0; ii < mat.Length; ii++)
             {
@@ -237,7 +237,6 @@ namespace BestFitLine
                 {
                     reduceRow(bigMat[jj], bigMat[ii], ii);
                 }
-                //Console.WriteLine(ii);
             }
             //this then gets the diagonal to be all ones
             for (int ii=0; ii<bigMat.Length; ii++)
@@ -253,28 +252,6 @@ namespace BestFitLine
                 for (int jj=0; jj<outMat[ii].Length; jj++)
                 {
                     outMat[ii][jj] = bigMat[ii][jj + outMat[ii].Length];
-                }
-            }
-
-            double[][] checkInv = multiply(multiply(outMat, mat), mat);
-            //print(checkInv);
-            //print(mat);
-            if (checkInv.Length!=mat.Length)
-            {
-                throw new ArgumentException("Check Inv length does not match original matrix dimensions");
-            }
-            for(int ii=0; ii<checkInv.Length; ii++)
-            {
-                if (checkInv[ii].Length != mat[ii].Length)
-                {
-                    throw new ArgumentException("Check Inv length does not match original matrix dimensions");
-                }
-                for (int jj=0; jj<checkInv.Length; jj++)
-                {
-                    //if (Math.Abs(checkInv[ii][jj]/mat[ii][jj]))
-                    {
-                        //throw new ArgumentException("Error inverting matrix");
-                    }
                 }
             }
 
